@@ -15,16 +15,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'  # Using a supported Node.js version
 
       - name: Install dependencies
         run: npm install
 
       - name: Build the app
-        run: npm run build
+        run: npm run build  # Ensure the build directory is created
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: build
+          folder: build  # This should match the folder where your build is generated
