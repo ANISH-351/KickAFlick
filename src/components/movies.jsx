@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import MoviesCard from './moviesCard';
-import axios from 'axios';
 import Pagination from './pagination';
 
 function Movies({ watchList, setWatchList }) {
@@ -27,15 +26,22 @@ function Movies({ watchList, setWatchList }) {
     setPage(page + 1);
   };
 
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/movie/popular?api_key=9633327e7d6c6c3bccdb34a476c06f92&language=en-US&page=${page}`
+      );
+      const data = await response.json();
+      setMovies(data.results);
+      console.log('Fetched movies:', data.results);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get(`https://api.themoviedb.org/3/movie/popular?api_key=9633327e7d6c6c3bccdb34a476c06f92&language=en-US&page=${page}`)
-      .then((res) => {
-        setMovies(res.data.results);
-        console.log('Fetched movies:', res.data.results);
-      }, [])
-      .catch((error) => console.error('Error fetching data:', error));
-  }, [page]);
+    fetchMovies();
+  }, [page]); // Only trigger when page changes
 
   return (
     <div>
@@ -44,17 +50,21 @@ function Movies({ watchList, setWatchList }) {
       </div>
 
       <div className="flex flex-row flex-wrap justify-center">
-        {movies.map((movieObj) => (
-          <MoviesCard
-            watchList={watchList}
-            removeWatchList={removeWatchList}
-            movieObj={movieObj}
-            handleWatchList={handleWatchList}
-            key={movieObj.id}
-            poster_path={movieObj.poster_path}
-            name={movieObj.original_title}
-          />
-        ))}
+        {movies.length > 0 ? (
+          movies.map((movieObj) => (
+            <MoviesCard
+              watchList={watchList}
+              removeWatchList={removeWatchList}
+              movieObj={movieObj}
+              handleWatchList={handleWatchList}
+              key={movieObj.id}
+              poster_path={movieObj.poster_path}
+              name={movieObj.original_title}
+            />
+          ))
+        ) : (
+          <p className="text-center text-lg">Loading movies...</p>
+        )}
       </div>
 
       <div>
